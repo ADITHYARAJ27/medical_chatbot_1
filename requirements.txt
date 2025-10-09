@@ -1,0 +1,22 @@
+# Core LangChain and LangGraph dependencies
+langchain
+langchain-groq
+langchain-community
+langgraph
+
+# PDF processing and document handling
+pypdf
+python-dotenv
+sentence-transformers
+
+# FastAPI and web server dependencies
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# Token booking system dependencies
+uuid  # For generating unique token IDs (built-in, but listed for clarity)
+
+# Optional: For additional features
+# python-multipart  # For form data and file uploads
+# jinja2           # For HTML templates if needed
