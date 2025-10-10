@@ -176,7 +176,7 @@ project/
     └── hospital_policies.pdf (optional)
 ```
 
-## Available Tools 🛠️
+## Available Tools 
 
 From `utils/tools.py` the assistant can use:
 
