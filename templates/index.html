@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Basic HTML meta tags for proper page rendering -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Assistant - Community Health Center</title>
+    
+    <!-- Link to our custom CSS file for styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Font Awesome icons for better visual elements -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Main container that holds everything -->
+    <div class="container">
+        <!-- Header section with hospital information -->
+        <header class="header">
+            <div class="hospital-info">
+                <!-- Hospital logo/icon and name -->
+                <div class="hospital-logo">
+                    <i class="fas fa-hospital"></i>
+                    <h1>Community Health Center Harichandanpur</h1>
+                </div>
+                
+                <!-- Hospital details -->
+                <div class="hospital-details">
+                    <p><i class="fas fa-map-marker-alt"></i> Keonjhar, Odisha, India</p>
+                    <p><i class="fas fa-user-md"></i> Dr. Hari - Medical Director</p>
+                    <p><i class="fas fa-clock"></i> 24/7 AI Assistant Available</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main chat interface -->
+        <main class="chat-container">
+            <!-- Chat messages area -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome message that appears when the page loads -->
+                <div class="message assistant-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="sender-name">Medical Assistant</span>
+                            <span class="message-time" id="welcomeTime"></span>
+                        </div>
+                        <div class="message-text">
+                            <p>Hello! I'm your AI Medical Assistant for Community Health Center Harichandanpur. I can help you with:</p>
+                            <ul>
+                                <li>🏥 Hospital policies and procedures</li>
+                                <li>📅 Token booking and appointment scheduling</li>
+                                <li>⏰ Visiting hours and guidelines</li>
+                                <li>👨‍⚕️ General medical information</li>
+                                <li>📊 Check token status and statistics</li>
+                            </ul>
+                            <p>How can I assist you today?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick action buttons for common tasks -->
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="sendQuickMessage('What are the visiting hours?')">
+                    <i class="fas fa-clock"></i> Visiting Hours
+                </button>
+                <button class="quick-btn" onclick="sendQuickMessage('How do I book a token?')">
+                    <i class="fas fa-calendar-plus"></i> Book Token
+                </button>
+                <button class="quick-btn" onclick="sendQuickMessage('What are the hospital policies?')">
+                    <i class="fas fa-file-medical"></i> Hospital Policies
+                </button>
+                <button class="quick-btn" onclick="sendQuickMessage('Check token statistics')">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </button>
+            </div>
+
+            <!-- Input area for typing messages -->
+            <div class="chat-input-container">
+                <div class="input-wrapper">
+                    <!-- Text input field for typing messages -->
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Type your question here..." 
+                        maxlength="500"
+                        autocomplete="off"
+                    >
+                    <!-- Send button -->
+                    <button id="sendButton" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <!-- Character counter and typing indicator -->
+                <div class="input-footer">
+                    <span class="char-counter" id="charCounter">0/500</span>
+                    <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span>Medical Assistant is typing...</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer with additional information -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 Community Health Center Harichandanpur. All rights reserved.</p>
+                <p>Powered by AI Medical Assistant | Under guidance of Dr. Harshin</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading overlay that appears when processing requests -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Processing your request...</p>
+        </div>
+    </div>
+
+    <!-- Include our JavaScript file for functionality -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

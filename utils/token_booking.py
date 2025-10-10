@@ -296,12 +296,12 @@ class TokenBookingManager:
             if os.path.exists(self.current_tokens_file):
                 with open(self.current_tokens_file, 'r', encoding='utf-8') as f:
                     self.current_tokens = json.load(f)
-                print(f"✅ Loaded current tokens from file")
+                print(f"Loaded current tokens from file")
             else:
                 self.current_tokens = {}
-                print("📝 No current tokens file found, starting fresh")
+                print("No current tokens file found, starting fresh")
         except Exception as e:
-            print(f"⚠️ Error loading current tokens: {e}")
+            print(f"Error loading current tokens: {e}")
             self.current_tokens = {}
     
     def _save_current_tokens(self):
