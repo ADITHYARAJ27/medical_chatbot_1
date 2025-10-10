@@ -1,29 +1,28 @@
-# Medical Assistant FastAPI 🏥
+# Medical Assistant Platform (FastAPI + Flask UI) 🏥
 
-A FastAPI-based medical assistant for Community Health Center Harichandanpur, Keonjhar, Odisha. This AI-powered assistant helps with hospital policies, procedures, visiting hours, and general medical inquiries.
+A FastAPI-based medical assistant with a simple Flask web UI for Community Health Center Harichandanpur, Keonjhar, Odisha. This AI-powered assistant helps with hospital policies, visiting hours, general medical inquiries, and includes a token booking system.
 
 ## Features ✨
 
-- **AI-Powered Responses**: Uses LangChain and Groq for intelligent conversations
-- **Hospital Policy Search**: Vector-based search through hospital policies PDF
-- **Multi-conversation Support**: Maintains conversation history with thread IDs
-- **RESTful API**: Clean and well-documented FastAPI endpoints
+- **AI-Powered Responses**: LangGraph + LangChain with Groq LLM
+- **Hospital Policy Search**: Vector-based search through `utils/data/hospital_policies.pdf`
+- **Multi-conversation Support**: Conversation memory via thread IDs
+- **RESTful API**: Clean FastAPI endpoints (+ Swagger/ReDoc)
+- **Flask Web UI**: Simple UI server proxying to FastAPI backend
+- **Token Booking System**: Book, search, update, cancel, and view stats for tokens
 - **Real-time Information**: Current date/time and hospital information
 
 ## Setup Instructions 🚀
 
 ### 1. Prerequisites
 
-- Python 3.8 or higher
-- Groq API key (sign up at [Groq Console](https://console.groq.com))
+- Python 3.10 or higher
+- Groq API key (sign up at `https://console.groq.com`)
 
 ### 2. Installation
 
 ```bash
-# Clone or download the project
-cd your-project-directory
-
-# Install dependencies
+# From project root
 pip install -r requirements.txt
 ```
 
@@ -32,109 +31,125 @@ pip install -r requirements.txt
 Create a `.env` file in the project root:
 
 ```bash
-# .env file
+# .env
 GROQ_API_KEY=your_groq_api_key_here
 ```
 
 ### 4. Prepare Hospital Policies (Optional)
 
 If you have a hospital policies PDF:
-- Create a folder: `utils/data/`
-- Place your PDF file as: `utils/data/hospital_policies.pdf`
+- Place your PDF file at `utils/data/hospital_policies.pdf`
 
 If no PDF is available, the system will use fallback content.
 
-### 5. Run the Application
+### 5. Run the Services
+
+You have two servers: FastAPI backend (core API) and Flask UI (web interface proxy).
 
 ```bash
-# Start the FastAPI server
+# Start FastAPI backend (recommended during development)
 python main.py
+# or
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-# Or use uvicorn directly
-uvicorn main:app --reload
+# In another terminal, start the Flask UI
+python ui_server.py  # serves UI at http://localhost:5000
 ```
 
-The API will be available at: http://localhost:8000
+- FastAPI API: `http://localhost:8000`
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
+- Flask UI: `http://localhost:5000`
 
 ## API Endpoints 📡
 
-### 1. Root Information
-```bash
-GET /
-```
-Returns basic API information and available endpoints.
+### Core
+- `GET /` – API info
+- `GET /health` – health check
+- `GET /info` – hospital and features info
+- `POST /chat` – chat with assistant
 
-### 2. Health Check
-```bash
-GET /health
-```
-Check if the service is running properly.
-
-### 3. Hospital Information
-```bash
-GET /info
-```
-Get details about the hospital and available services.
-
-### 4. Chat with Assistant
-```bash
-POST /chat
-Content-Type: application/json
-
+Request example:
+```json
 {
-    "message": "What are the visiting hours?",
-    "thread_id": "optional-thread-id"
+  "message": "What are the visiting hours?",
+  "thread_id": "optional-thread-id"
 }
 ```
 
-### 5. Interactive Documentation
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+### Token Booking (`/tokens`)
+The token booking API enables patient token management.
+
+- `POST /tokens/book` – create a token
+- `GET /tokens/{token_id}` – get details
+- `PUT /tokens/{token_id}/status` – update status
+- `DELETE /tokens/{token_id}` – cancel
+- `GET /tokens/search` – filter by patient, phone, department, date, status, token number
+- `GET /tokens/daily/{date}` – bookings for a date (optional `department`)
+- `GET /tokens/stats` – summary stats
+- `GET /tokens/departments` – list departments
+- `GET /tokens/statuses` – list statuses
+- `POST /tokens/current/set` – set the token currently being served by a doctor
+- `GET /tokens/current/{doctor_name}` – get which token a doctor is serving now
+
+See more in `utils/token_routes.py` and `utils/token_booking.py`.
+
+### Interactive Documentation
+- Swagger UI: `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`
 
 ## Usage Examples 💡
 
-### Python Requests
+### Python (chat)
 ```python
 import requests
-
-# Chat with the assistant
-response = requests.post(
-    "http://localhost:8000/chat",
-    json={
-        "message": "What are the visiting hours?",
-        "thread_id": "user-123"
-    }
-)
-
-result = response.json()
-print(result["response"])
-```
-
-### Curl
-```bash
-# Health check
-curl -X GET "http://localhost:8000/health"
-
-# Chat
-curl -X POST "http://localhost:8000/chat" \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Who is the hospital owner?"}'
-```
-
-### JavaScript/Fetch
-```javascript
-fetch('http://localhost:8000/chat', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        message: "What are the hospital policies?",
-        thread_id: "web-user-1"
-    })
+resp = requests.post("http://localhost:8000/chat", json={
+    "message": "What are the visiting hours?",
+    "thread_id": "user-123"
 })
-.then(response => response.json())
-.then(data => console.log(data.response));
+print(resp.json()["response"])
+```
+
+### Curl (health + chat)
+```bash
+curl -s "http://localhost:8000/health"
+
+curl -s -X POST "http://localhost:8000/chat" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Who is the hospital owner?"}'
+```
+
+### Token booking: create and check
+```bash
+# Book a token
+curl -s -X POST "http://localhost:8000/tokens/book" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "patient_name": "John Doe",
+    "patient_phone": "9998887777",
+    "patient_age": 42,
+    "department": "general_medicine",
+    "booking_date": "2025-10-10",
+    "booking_time": "10:30",
+    "doctor_name": "Dr. Sharma",
+    "symptoms": "fever, cough",
+    "priority": "normal"
+  }'
+
+# Get token details
+curl -s "http://localhost:8000/tokens/{token_id}"
+
+# Set current serving token for a doctor
+curl -s -X POST "http://localhost:8000/tokens/current/set" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "department": "cardiology",
+    "doctor_name": "Dr. Sharma",
+    "token_id": "abc-123"
+  }'
+
+# Query which token the doctor is on
+curl -s "http://localhost:8000/tokens/current/Dr.%20Sharma"
 ```
 
 ## Project Structure 📁
@@ -142,81 +157,78 @@ fetch('http://localhost:8000/chat', {
 ```
 project/
 ├── main.py                 # FastAPI application
-├── agent.py               # LangGraph agent setup
-├── requirements.txt       # Dependencies
-├── .env                   # Environment variables
-├── .gitignore            # Git ignore rules
+├── ui_server.py            # Flask UI server (proxy to FastAPI)
+├── agent.py                # LangGraph agent setup
+├── requirements.txt        # Dependencies
+├── .env                    # Environment variables
 ├── utils/
-│   ├── __init__.py       # Package initialization
-│   ├── llm.py           # Groq LLM configuration
-│   ├── nodes.py         # Agent nodes
-│   ├── state.py         # State management
-│   ├── tools.py         # Agent tools
-│   └── data/            # Data folder
-│       └── hospital_policies.pdf
-└── test_api.py          # API testing script
+│   ├── __init__.py
+│   ├── llm.py             # Groq LLM configuration
+│   ├── nodes.py           # Agent nodes
+│   ├── state.py           # State management
+│   ├── tools.py           # Agent tools (incl. token helpers)
+│   ├── token_booking.py   # Token booking domain/model/manager
+│   └── token_routes.py    # FastAPI routes for tokens
+├── templates/
+│   └── index.html         # Web UI template
+├── static/                # CSS/JS for UI
+└── utils/data/
+    └── hospital_policies.pdf (optional)
 ```
 
 ## Available Tools 🛠️
 
-The assistant has access to these tools:
+From `utils/tools.py` the assistant can use:
 
-1. **search_hospital_policies**: Search through hospital policies and procedures
-2. **get_current_datetime**: Get current date and time
-3. **get_owner_info**: Information about Dr. Harshin and hospital leadership
+1. `search_hospital_policies`
+2. `get_current_datetime`
+3. `get_owner_info`
+4. `book_medical_token`
+5. `check_token_status`
+6. `search_tokens`
+7. `get_daily_tokens`
+8. `get_booking_statistics`
+9. `get_current_serving_token` ← new
 
-## Example Questions 🤔
+## Flask UI Endpoints (proxy) 🌐
 
-Try asking the assistant:
+The Flask server (`ui_server.py`) exposes convenient endpoints and proxies to the FastAPI backend:
+- `GET /` – Chat UI
+- `POST /api/chat` – proxies to `POST /chat`
+- `GET /api/health` – checks backend health
+- `GET /api/info` – proxies to `GET /info` with fallback
+- `GET|POST /api/tokens` – basic proxy for token operations
+- `GET /test` – simple test page
 
-- "What are the visiting hours?"
-- "Who is the hospital owner?"
-- "What are the visitor policies?"
-- "What is the current date?"
-- "Tell me about patient care policies"
-- "How many visitors are allowed at a time?"
+Ensure FastAPI is running at `http://localhost:8000` before starting the Flask UI.
 
 ## Troubleshooting 🔧
 
-### Common Issues:
+- See `TROUBLESHOOTING.md` for common startup and runtime issues.
+- If policies PDF fails to load, ensure `utils/data/hospital_policies.pdf` exists; fallback content will be used otherwise.
+- If the UI cannot chat, verify the FastAPI backend is running and reachable by the Flask server.
+- If the agent fails to initialize, check `GROQ_API_KEY` and internet access.
 
-1. **"Agent not initialized" error**
-   - Check if your Groq API key is valid
-   - Ensure all dependencies are installed
+## Token Booking Guide 📖
 
-2. **PDF loading fails**
-   - Check if the PDF file exists at `utils/data/hospital_policies.pdf`
-   - The system will use fallback content if PDF is missing
-
-3. **Connection errors**
-   - Verify the server is running on the correct port
-   - Check firewall settings if accessing remotely
-
-### Logs
-The application provides helpful logs during startup and operation. Check the console for any error messages.
+For end-to-end examples and best practices, see `TOKEN_BOOKING_GUIDE.md`.
 
 ## Production Deployment 🚀
 
-For production deployment:
+- Run Uvicorn without reload, behind a process manager / reverse proxy.
+- Configure HTTPS, logging, and secure env management.
 
-1. Set `reload=False` in the uvicorn configuration
-2. Use a production WSGI server like Gunicorn
-3. Set up proper logging
-4. Configure environment variables securely
-5. Use HTTPS in production
-
+Example:
 ```bash
-# Example production command
 gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 ```
 
 ## Contributing 🤝
 
-Feel free to contribute to this project by:
-- Adding new features
-- Improving error handling
-- Enhancing documentation
-- Adding more hospital-specific tools
+- Add new features or tools
+- Improve error handling and logs
+- Enhance documentation
+- Extend the token booking workflows
 
 ---
 
