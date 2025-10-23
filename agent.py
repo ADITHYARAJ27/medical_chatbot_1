@@ -28,8 +28,13 @@ def run_agent(agent_executor, user_input: str, thread_id: str = "default"):
     """Run the agent with user input"""
     try:
         config = {"configurable": {"thread_id": thread_id}}
+        
+        # Create human message with thread_id in additional_kwargs
+        human_message = HumanMessage(content=user_input)
+        human_message.additional_kwargs = {"thread_id": thread_id}
+        
         result = agent_executor.invoke(
-            {"messages": [HumanMessage(content=user_input)]},
+            {"messages": [human_message]},
             config=config
         )
         return result["messages"][-1].content

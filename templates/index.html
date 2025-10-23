@@ -48,15 +48,23 @@
                             <span class="message-time" id="welcomeTime"></span>
                         </div>
                         <div class="message-text">
-                            <p>Hello! I'm your AI Medical Assistant for Community Health Center Harichandanpur. I can help you with:</p>
+                            <p>Hello! I'm your AI Medical Assistant for Community Health Center Harichandanpur. To provide you with the best assistance, I'll need to collect some basic information from you first.</p>
+                            <p><strong>I'll ask you for:</strong></p>
+                            <ol>
+                                <li>👤 Your full name</li>
+                                <li>🎂 Your age</li>
+                                <li>📞 Your phone number</li>
+                                <li>🏥 Your medical details or symptoms</li>
+                            </ol>
+                            <p>After collecting this information, I can help you with:</p>
                             <ul>
-                                <li>🏥 Hospital policies and procedures</li>
                                 <li>📅 Token booking and appointment scheduling</li>
+                                <li>🏥 Hospital policies and procedures</li>
                                 <li>⏰ Visiting hours and guidelines</li>
                                 <li>👨‍⚕️ General medical information</li>
                                 <li>📊 Check token status and statistics</li>
                             </ul>
-                            <p>How can I assist you today?</p>
+                            <p><strong>Let's start! May I please have your full name?</strong></p>
                         </div>
                     </div>
                 </div>
@@ -64,17 +72,17 @@
 
             <!-- Quick action buttons for common tasks -->
             <div class="quick-actions">
+                <button class="quick-btn" onclick="sendQuickMessage('I want to book an appointment')">
+                    <i class="fas fa-calendar-plus"></i> Book Appointment
+                </button>
                 <button class="quick-btn" onclick="sendQuickMessage('What are the visiting hours?')">
                     <i class="fas fa-clock"></i> Visiting Hours
-                </button>
-                <button class="quick-btn" onclick="sendQuickMessage('How do I book a token?')">
-                    <i class="fas fa-calendar-plus"></i> Book Token
                 </button>
                 <button class="quick-btn" onclick="sendQuickMessage('What are the hospital policies?')">
                     <i class="fas fa-file-medical"></i> Hospital Policies
                 </button>
-                <button class="quick-btn" onclick="sendQuickMessage('Check token statistics')">
-                    <i class="fas fa-chart-bar"></i> Statistics
+                <button class="quick-btn" onclick="sendQuickMessage('Check my token status')">
+                    <i class="fas fa-search"></i> Check Status
                 </button>
             </div>
 
